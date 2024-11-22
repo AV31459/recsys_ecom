@@ -1,0 +1,75 @@
+stages:
+
+  ETL_cat_tree:
+    cmd: python steps/etl_cat_tree.py
+    deps:
+      - steps/etl_cat_tree.py
+    params:
+      - PATH_CSV_CAT_TREE
+    outs:
+      - cache/cat_tree.parquet
+  
+  ETL_item_properties:
+    cmd: python steps/etl_items.py
+    deps:
+      - steps/etl_items.py
+      - cache/cat_tree.parquet
+    params:
+      - PATH_CSV_ITEMS1
+      - PATH_CSV_ITEMS2
+    outs:
+      - cache/items.parquet
+
+  ETL_events:
+    cmd: python steps/etl_events.py
+    deps:
+      - steps/etl_events.py
+      - cache/items.parquet
+    params:
+      - PATH_CSV_EVENTS
+    outs:
+      - cache/events.parquet
+  
+  Train_test_split:
+    cmd: python steps/train_test_split.py
+    deps:
+      - steps/train_test_split.py
+      - cache/items.parquet
+      - cache/events.parquet
+      - build_date.yaml
+    params:
+      - build_date.yaml:
+        - build_date
+    outs:
+      - cache/events_train.parquet
+      - cache/events_test.parquet
+      - recs/items_train.parquet
+
+  Build_top_popular:
+    cmd: python steps/build_top_popular.py
+    deps:
+      - steps/build_top_popular.py
+      - cache/events_train.parquet
+      - recs/items_train.parquet
+    params:
+      - N_RECS_USER
+    outs:
+      - recs/top_popular.parquet
+
+  Build_weighted_als:
+    cmd: python steps/build_weighted_als.py
+    deps:
+      - steps/build_weighted_als.py
+      - cache/events_train.parquet
+    params:
+      - N_RECS_USER
+      - RANDOM_STATE
+      - ALS_VIEW_WEIGHT
+      - ALS_ADDTOCART_WEIGHT
+      - ALS_FACTORS
+      - ALS_ITERATIONS
+      - ALS_REGULARIZATION
+      - ALS_FILTER_ALREADY_LIKED
+    outs:
+      - recs/weighted_als.parquet
+

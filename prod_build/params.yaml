@@ -1,0 +1,19 @@
+# Пути к файлам с исходными данными
+PATH_CSV_CAT_TREE: '../data/category_tree.csv'
+PATH_CSV_ITEMS1: '../data/item_properties_part1.csv'
+PATH_CSV_ITEMS2: '../data/item_properties_part2.csv'
+PATH_CSV_EVENTS: '../data/events.csv'
+
+# Кол-во генерируемых рекомендаций для одного пользователя
+N_RECS_USER: 50
+
+# Параметры модели ALS 
+ALS_VIEW_WEIGHT: .25
+ALS_ADDTOCART_WEIGHT: .75
+ALS_FACTORS: 50
+ALS_ITERATIONS: 50
+ALS_REGULARIZATION: .05
+ALS_FILTER_ALREADY_LIKED: False
+
+RANDOM_STATE: 123
+

@@ -1,0 +1,32 @@
+services:
+  recsys:
+    env_file:
+      - .env_service
+    build:
+      dockerfile: Dockerfile_app
+    ports:
+      - ${SERVICE_HOST}:${APP_PORT_EXTERNAL}:${APP_PORT_DOCKER}
+    volumes:
+      - ../prod_build/recs:/recsys_service/recs
+    hostname: recsys_app
+
+  prometheus:
+    image: prom/prometheus
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=${PROMETHEUS_LOG_LEVEL}'
+    ports:
+      - ${SERVICE_HOST}:${PROMETHEUS_PORT_EXTERNAL}:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    hostname: prometheus
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - ${SERVICE_HOST}:${GRAFANA_PORT_EXTERNAL}:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_USER_PASSWORD}
+      - GF_LOG_LEVEL=${GRAFANA_LOG_LEVEL}
+    hostname: grafana

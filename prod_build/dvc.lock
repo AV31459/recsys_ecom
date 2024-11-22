@@ -1,0 +1,140 @@
+schema: '2.0'
+stages:
+  ETL_cat_tree:
+    cmd: python steps/etl_cat_tree.py
+    deps:
+    - path: steps/etl_cat_tree.py
+      hash: md5
+      md5: 594f1341d35ef4e036a90d0d8dde5594
+      size: 3790
+    params:
+      params.yaml:
+        PATH_CSV_CAT_TREE: ../data/category_tree.csv
+    outs:
+    - path: cache/cat_tree.parquet
+      hash: md5
+      md5: b1f5611ef402344a614a1041b8461aaa
+      size: 23672
+  ETL_item_properties:
+    cmd: python steps/etl_items.py
+    deps:
+    - path: cache/cat_tree.parquet
+      hash: md5
+      md5: b1f5611ef402344a614a1041b8461aaa
+      size: 23672
+    - path: steps/etl_items.py
+      hash: md5
+      md5: 3270d2bf10d3b188e9ec9b46e75f64f7
+      size: 1789
+    params:
+      params.yaml:
+        PATH_CSV_ITEMS1: ../data/item_properties_part1.csv
+        PATH_CSV_ITEMS2: ../data/item_properties_part2.csv
+    outs:
+    - path: cache/items.parquet
+      hash: md5
+      md5: 4a3fc89fc7a7d1da6dd07bbe0f4207ad
+      size: 5108649
+  ETL_events:
+    cmd: python steps/etl_events.py
+    deps:
+    - path: cache/items.parquet
+      hash: md5
+      md5: 4a3fc89fc7a7d1da6dd07bbe0f4207ad
+      size: 5108649
+    - path: steps/etl_events.py
+      hash: md5
+      md5: 1da2e7e60971d344c3eba56379889c22
+      size: 1135
+    params:
+      params.yaml:
+        PATH_CSV_EVENTS: ../data/events.csv
+    outs:
+    - path: cache/events.parquet
+      hash: md5
+      md5: 8908f8f24bf626a61bb1b2330538595a
+      size: 35882272
+  Train_test_split:
+    cmd: python steps/train_test_split.py
+    deps:
+    - path: build_date.yaml
+      hash: md5
+      md5: d40e7e0347d309139442ba3c39495913
+      size: 25
+    - path: cache/events.parquet
+      hash: md5
+      md5: 8908f8f24bf626a61bb1b2330538595a
+      size: 35882272
+    - path: cache/items.parquet
+      hash: md5
+      md5: 4a3fc89fc7a7d1da6dd07bbe0f4207ad
+      size: 5108649
+    - path: steps/train_test_split.py
+      hash: md5
+      md5: b0f5312f693d83608bdd86cadb5380d7
+      size: 2128
+    params:
+      build_date.yaml:
+        build_date: '2015-09-01'
+    outs:
+    - path: cache/events_test.parquet
+      hash: md5
+      md5: 4fa4684bbd0371ad6de984dd68c73b63
+      size: 5847386
+    - path: cache/events_train.parquet
+      hash: md5
+      md5: 9ddbb58623815fe5c57c91254b0859c9
+      size: 31877265
+    - path: recs/items_train.parquet
+      hash: md5
+      md5: 839c38885ee35317849f0873f5c7d8f6
+      size: 4027985
+  Build_top_popular:
+    cmd: python steps/build_top_popular.py
+    deps:
+    - path: cache/events_train.parquet
+      hash: md5
+      md5: 9ddbb58623815fe5c57c91254b0859c9
+      size: 31877265
+    - path: recs/items_train.parquet
+      hash: md5
+      md5: 839c38885ee35317849f0873f5c7d8f6
+      size: 4027985
+    - path: steps/build_top_popular.py
+      hash: md5
+      md5: bb13ebd3101fab4e7e9196a29711ce8d
+      size: 1246
+    params:
+      params.yaml:
+        N_RECS_USER: 50
+    outs:
+    - path: recs/top_popular.parquet
+      hash: md5
+      md5: 29f0bd733f10cd36309b3c72cddec5e3
+      size: 168621
+  Build_weighted_als:
+    cmd: python steps/build_weighted_als.py
+    deps:
+    - path: cache/events_train.parquet
+      hash: md5
+      md5: 9ddbb58623815fe5c57c91254b0859c9
+      size: 31877265
+    - path: steps/build_weighted_als.py
+      hash: md5
+      md5: d6569070830e764b77bbfd3945afe5d5
+      size: 4875
+    params:
+      params.yaml:
+        ALS_ADDTOCART_WEIGHT: 0.75
+        ALS_FACTORS: 50
+        ALS_FILTER_ALREADY_LIKED: false
+        ALS_ITERATIONS: 50
+        ALS_REGULARIZATION: 0.05
+        ALS_VIEW_WEIGHT: 0.25
+        N_RECS_USER: 50
+        RANDOM_STATE: 123
+    outs:
+    - path: recs/weighted_als.parquet
+      hash: md5
+      md5: 4842df1474aed487e38103f508d78ace
+      size: 350755627

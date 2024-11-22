@@ -1,0 +1,12 @@
+FROM python:3.10-slim
+
+COPY ./requirements_service.txt /recsys_service/requirements.txt
+
+WORKDIR recsys_service 
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY ./app /recsys_service/app
+
+CMD uvicorn --app-dir=app --host=0.0.0.0 --port=${APP_PORT_DOCKER} --reload \
+service:app

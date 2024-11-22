@@ -1,0 +1,127 @@
+[
+  {
+    "test_name": "Healthcheck status [200]",
+    "uri": "/",
+    "method": "get",
+    "data": null,
+    "response_code": 200
+  },
+  {
+    "test_name": "Wrong JSON keys [422]",
+    "uri": "/recs",
+    "method": "post",
+    "_comment": "Русские символы в ключах ниже - специально :)",
+    "data": {
+      "юзер_ид": 0,
+      "эн_рекс": 5
+    },
+    "response_code": 422
+  },
+  {
+    "test_name": "Incorrect user_id [422]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": -23456
+    },
+    "response_code": 422
+  },
+  {
+    "test_name": "Incorrect n_recs [422]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 0,
+      "n_recs": -10
+    },
+    "response_code": 422
+  },
+  {
+    "test_name": "Incorrect last_items [422]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 0,
+      "last_items": [1, 2, 4, -7, 10]
+    },
+    "response_code": 422
+  },
+  {
+    "test_name": "Cold user: no last_items, no personal [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 4
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [461686, 312728, 409804, 29196, 320130, 48030, 257040, 316753,445351, 441852]
+    }
+  },
+  {
+    "test_name": "One last_item, no personal, n_recs=8 [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 4,
+      "last_items": [407908],
+      "n_recs": 8
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [282528, 461686, 172842, 312728, 409562, 409804, 326213, 29196]
+    }
+  },
+  {
+    "test_name": "2 last_items with 1 category, no personal [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 4,
+      "last_items": [407908, 244494]
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [282528, 461686, 172842, 312728, 409562, 409804, 326213, 29196, 144962, 320130]
+    }
+  },
+  {
+    "test_name": "2 last_items with 2 categories, no personal [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 4,
+      "last_items": [197789, 407908]
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [282528, 161354, 461686, 172842, 380118, 312728, 409562, 214571, 409804, 326213]
+    }
+  },
+  {
+    "test_name": "3 last_items with 3 categories, no personal [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 4,
+      "last_items": [163711, 197789, 407908]
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [282528, 161354, 434277, 461686, 172842, 380118, 457970, 312728, 409562, 214571]
+    }
+  },
+  {
+    "test_name": "3 last_items with 3 categories AND personal [200]",
+    "uri": "/recs",
+    "method": "post",
+    "data": {
+      "user_id": 5,
+      "last_items": [163711, 197789, 407908]
+    },
+    "response_code": 200,
+    "response_data": {
+      "recs": [282528, 339703, 161354, 186256, 434277, 247909, 461686, 372188, 172842, 290999]
+    }
+  }
+]
